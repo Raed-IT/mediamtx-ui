@@ -8,33 +8,46 @@
       @click="toggleControls"
     />
 
-    <!-- Overlay: connecting / error -->
+    <!-- الطبقة العلوية: الاتصال / الخطأ -->
     <div v-if="player.state.value !== 'connected'" class="player-overlay">
       <template v-if="player.state.value === 'connecting'">
         <el-icon class="spin" :size="36"><Loading /></el-icon>
-        <span class="overlay-text">正在连接...</span>
+        <span class="overlay-text">جاري الاتصال...</span>
       </template>
+
       <template v-else-if="player.state.value === 'reconnecting'">
         <el-icon class="spin" :size="36"><Loading /></el-icon>
-        <span class="overlay-text">{{ player.error.value || '正在重连...' }}</span>
+        <span class="overlay-text">
+          {{ player.error.value || 'جاري إعادة الاتصال...' }}
+        </span>
       </template>
+
       <template v-else-if="player.state.value === 'error'">
         <el-icon :size="36" color="#f56c6c"><CircleCloseFilled /></el-icon>
-        <span class="overlay-text">{{ player.error.value || '连接失败' }}</span>
-        <el-button type="primary" size="small" @click="retry" style="margin-top: 8px">重试</el-button>
+        <span class="overlay-text">
+          {{ player.error.value || 'فشل الاتصال' }}
+        </span>
+        <el-button type="primary" size="small" @click="retry" style="margin-top: 8px">
+          إعادة المحاولة
+        </el-button>
       </template>
+
       <template v-else>
         <el-icon :size="36" color="#909399"><VideoPlay /></el-icon>
-        <span class="overlay-text">等待播放</span>
+        <span class="overlay-text">في انتظار التشغيل</span>
       </template>
     </div>
 
-    <!-- Bottom toolbar -->
-    <div class="player-toolbar" :class="{ visible: showControls || player.state.value !== 'connected' }">
+    <!-- شريط الأدوات السفلي -->
+    <div
+      class="player-toolbar"
+      :class="{ visible: showControls || player.state.value !== 'connected' }"
+    >
       <div class="toolbar-left">
         <el-tag size="small" type="success" effect="dark">WebRTC</el-tag>
         <span class="path-label">{{ pathName }}</span>
       </div>
+
       <div class="toolbar-right">
         <el-button text size="small" @click="toggleMute" class="toolbar-btn">
           <el-icon :size="18">
@@ -42,6 +55,7 @@
             <Microphone v-else />
           </el-icon>
         </el-button>
+
         <el-button text size="small" @click="toggleFullscreen" class="toolbar-btn">
           <el-icon :size="18"><FullScreen /></el-icon>
         </el-button>
@@ -71,12 +85,14 @@ const videoEl = ref<HTMLVideoElement | null>(null)
 const player = useWebRTCPlayer(videoEl)
 const showControls = ref(true)
 const isMuted = ref(true)
+
 let controlsTimer: ReturnType<typeof setTimeout> | null = null
 
 function getWhepUrl() {
-  if (props.whepBaseUrl) return `${props.whepBaseUrl}/${props.pathName}/whep`
-  // Use direct connection to MediaMTX WebRTC server (same host, port 8889)
-  // Vite proxy interferes with WHEP protocol headers, so we connect directly
+  if (props.whepBaseUrl) {
+    return `${props.whepBaseUrl}/${props.pathName}/whep`
+  }
+
   return `${window.location.protocol}//${window.location.hostname}:8889/${props.pathName}/whep`
 }
 
@@ -97,7 +113,9 @@ function toggleMute() {
 
 function toggleFullscreen() {
   const el = videoEl.value
+
   if (!el) return
+
   if (document.fullscreenElement) {
     document.exitFullscreen()
   } else {
@@ -111,7 +129,10 @@ function toggleControls() {
 }
 
 function resetControlsTimer() {
-  if (controlsTimer) clearTimeout(controlsTimer)
+  if (controlsTimer) {
+    clearTimeout(controlsTimer)
+  }
+
   if (showControls.value) {
     controlsTimer = setTimeout(() => {
       showControls.value = false
@@ -119,16 +140,22 @@ function resetControlsTimer() {
   }
 }
 
-watch(() => props.pathName, () => {
-  player.disconnect()
-  startPlayer()
-})
+watch(
+  () => props.pathName,
+  () => {
+    player.disconnect()
+    startPlayer()
+  }
+)
 
 onMounted(startPlayer)
 
 onBeforeUnmount(() => {
   player.disconnect()
-  if (controlsTimer) clearTimeout(controlsTimer)
+
+  if (controlsTimer) {
+    clearTimeout(controlsTimer)
+  }
 })
 </script>
 
@@ -172,8 +199,13 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .player-toolbar {

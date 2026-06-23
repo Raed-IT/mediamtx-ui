@@ -73,7 +73,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  document.title = `${to.meta.title || 'MediaMTX'} - لوحة تحكم MediaMTX`
+  document.title = `${to.meta.title || 'Stream Control'} - لوحة تحكم `
 })
 
 export default router
